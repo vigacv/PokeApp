@@ -55,7 +55,7 @@ class PokemonListAdapter(private val fragment: Fragment, private val pokemonList
         holder.tviPkSpAttack.text = pokemonList[position].spAttack.toString()
         holder.tviPkSpDefense.text = pokemonList[position].spDefense.toString()
 
-        Glide.with(fragment).load(pokemonList[position]).into(holder.iviPokemon)
+        Glide.with(fragment).load(pokemonList[position].imgUrl).into(holder.iviPokemon)
     }
 
     override fun getItemCount(): Int {
