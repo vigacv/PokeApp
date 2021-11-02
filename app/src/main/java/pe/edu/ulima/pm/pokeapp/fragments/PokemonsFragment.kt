@@ -1,5 +1,6 @@
 package pe.edu.ulima.pm.pokeapp.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,17 @@ import pe.edu.ulima.pm.pokeapp.model.Pokemon
 import pe.edu.ulima.pm.pokeapp.model.PokemonManager
 
 class PokemonsFragment: Fragment() {
+
+    interface OnPokemonsFragment{
+        fun onAddPokemonItemClick(pokemon:Pokemon)
+    }
+
+    private var listener: OnPokemonsFragment? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? OnPokemonsFragment
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,10 +42,13 @@ class PokemonsFragment: Fragment() {
 
         val rviPokemon = view.findViewById<RecyclerView>(R.id.rviPokemons)
         val pokemonManager = PokemonManager(requireActivity().applicationContext)
+
         pokemonManager.getPokemons(currentPage,{pkList: List<Pokemon> ->
             pokemonList.addAll(pkList)
             rviPokemon.adapter = PokemonListAdapter(this, pokemonList){ pokemon: Pokemon ->
-                println("Test")
+                println("Test: " + pokemon.name)
+                listener?.onAddPokemonItemClick(pokemon)
+
             }
         }, {error ->
             println("Error: $error")

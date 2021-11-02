@@ -12,8 +12,10 @@ import com.bumptech.glide.Glide
 import pe.edu.ulima.pm.pokeapp.R
 import pe.edu.ulima.pm.pokeapp.model.Pokemon
 
-class PokemonListAdapter(private val fragment: Fragment, val pokemonList: MutableList<Pokemon>, private val listener: (Pokemon) -> Unit):
-    RecyclerView.Adapter<PokemonListAdapter.ViewHolder>() {
+class PokemonListAdapter(private val fragment: Fragment,
+                         val pokemonList: MutableList<Pokemon>,
+                         private val listener: (Pokemon) -> Unit): RecyclerView.Adapter<PokemonListAdapter.ViewHolder>() {
+
     class ViewHolder(view: View, val pokemonList: List<Pokemon>, val listener: (Pokemon) -> Unit): RecyclerView.ViewHolder(view), View.OnClickListener {
         val iviPokemon: ImageView
         val tviPkName: TextView
