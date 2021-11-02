@@ -16,7 +16,8 @@ class PokemonListAdapter(private val fragment: Fragment,
                          val pokemonList: MutableList<Pokemon>,
                          private val listener: (Pokemon) -> Unit): RecyclerView.Adapter<PokemonListAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View, val pokemonList: List<Pokemon>, val listener: (Pokemon) -> Unit): RecyclerView.ViewHolder(view), View.OnClickListener {
+    class ViewHolder(view: View, val pokemonList: List<Pokemon>,
+                     val listener: (Pokemon) -> Unit): RecyclerView.ViewHolder(view), View.OnClickListener {
         val iviPokemon: ImageView
         val tviPkName: TextView
         val tviPkHp: TextView
@@ -56,7 +57,6 @@ class PokemonListAdapter(private val fragment: Fragment,
         holder.tviPkDefense.text = pokemonList[position].defense.toString()
         holder.tviPkSpAttack.text = pokemonList[position].spAttack.toString()
         holder.tviPkSpDefense.text = pokemonList[position].spDefense.toString()
-
         Glide.with(fragment).load(pokemonList[position].imgUrl).into(holder.iviPokemon)
     }
 

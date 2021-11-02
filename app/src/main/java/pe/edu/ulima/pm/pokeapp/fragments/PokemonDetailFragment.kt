@@ -12,9 +12,12 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import pe.edu.ulima.pm.pokeapp.R
+import pe.edu.ulima.pm.pokeapp.adapter.PokemonFavoriteListAdapter
 import pe.edu.ulima.pm.pokeapp.model.Pokemon
 import pe.edu.ulima.pm.pokeapp.model.PokemonManager
+import java.io.FileNotFoundException
 
 class PokemonDetailFragment: Fragment() {
     interface OnPokemonDetailFragmentListener{
@@ -41,12 +44,33 @@ class PokemonDetailFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val pokemonManager = PokemonManager(requireActivity().applicationContext)
         val btnAddFavorite = view.findViewById<Button>(R.id.btnAddFavorite)
+
+        if (pokemonManager.isPkFav(pokemon!!.id) == true){
+            btnAddFavorite.setEnabled(false)
+        }else{
+            btnAddFavorite.setEnabled(true)
+        }
+
         setPokemonDetail(view, pokemon!!)
 
         btnAddFavorite.setOnClickListener{
+            pokemonManager.addPkFav(pokemon!!.id)
             listener?.onAddFavoriteClick()
         }
+    }
+
+    private fun almacenarPokemonAI(){
+        val gson = Gson()
+        val pokemonManager = PokemonManager(requireActivity().applicationContext)
+        /*
+        val pkFavList = pokemonManager.getPokemonsFavorite()
+        context?.openFileOutput("pokemon_fav.json", Context.MODE_PRIVATE).use{
+            it!!.write(gson.toJson(pkFavList).toByteArray(Charsets.UTF_8))
+        }
+        */
     }
 
     private fun setPokemonDetail(view: View, pokemon: Pokemon){

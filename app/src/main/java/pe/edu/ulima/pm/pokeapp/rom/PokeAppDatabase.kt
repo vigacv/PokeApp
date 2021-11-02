@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import pe.edu.ulima.pm.pokeapp.model.Pokemon
 
-@Database(entities = [Pokemon::class], version = 1)
+@Database(entities = [Pokemon::class], version = 2)
 abstract class PokeAppDatabase: RoomDatabase() {
     abstract fun pokemonDAO(): PokemonDAO
 }

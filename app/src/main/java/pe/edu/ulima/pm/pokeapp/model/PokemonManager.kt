@@ -35,7 +35,7 @@ class PokemonManager(private val context: Context) {
         }
     }
 
-    fun getPokemonsRetrofit(page: Int, callbackOK: (List<Pokemon>) -> Unit, callbackError: (String) -> Unit){
+    private fun getPokemonsRetrofit(page: Int, callbackOK: (List<Pokemon>) -> Unit, callbackError: (String) -> Unit){
         val retrofit = Retrofit.Builder()
             .baseUrl(API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -62,7 +62,7 @@ class PokemonManager(private val context: Context) {
                                 val pokemonSpDefense = p1.body()?.stats!![4].base_stat
                                 val pokemonImgUrl = p1.body()?.sprites?.front_default
 
-                                val newPokemon = Pokemon(0,pokemonName, pokemonHp, pokemonAttack, pokemonDefense, pokemonSpAttack, pokemonSpDefense, pokemonImgUrl!!)
+                                val newPokemon = Pokemon(0,pokemonName, pokemonHp, pokemonAttack, pokemonDefense, pokemonSpAttack, pokemonSpDefense, pokemonImgUrl!!, false)
                                 pokemonList.add(newPokemon)
 
                                 if(pokemonList.size >= results.size){
@@ -85,13 +85,42 @@ class PokemonManager(private val context: Context) {
         })
     }
 
-    fun getPokemonsRoom(page: Int): List<Pokemon>{
+    private fun getPokemonsRoom(page: Int): List<Pokemon>{
         return db.pokemonDAO().findAll((page*20))
+    }
+
+    private fun getPokemonsFavorite(): List<Pokemon> {
+        return db.pokemonDAO().findFavorites()
     }
 
     private fun saveIntoRoom(pokemons: List<Pokemon>){
         pokemons.forEach {
             db.pokemonDAO().insert(it)
+        }
+    }
+
+    fun addPkFav(idPokemon:Long) {
+        db.pokemonDAO().updateFav(idPokemon, true)
+    }
+
+    fun deletePkFav(idPokemon:Long) {
+        db.pokemonDAO().updateFav(idPokemon, false)
+    }
+
+    fun isPkFav(idPokemon:Long): Boolean{
+        return db.pokemonDAO().isPkFav(idPokemon)
+    }
+
+    fun getPokemonsFav(callbackOK: (List<Pokemon>) -> Unit, callbackError: (String) -> Unit){
+        try {
+            val pokemonsRoom = getPokemonsFavorite()
+            if(pokemonsRoom.isNotEmpty()){
+                println("Loading pokemons from Room...")
+                println(pokemonsRoom)
+                callbackOK(pokemonsRoom)
+            }
+        }catch (exception: Exception){
+            exception.message?.let { callbackError(it) }
         }
     }
 }

@@ -16,7 +16,7 @@ import pe.edu.ulima.pm.pokeapp.model.PokemonManager
 class PokemonsFragment: Fragment() {
 
     interface OnPokemonsFragment{
-        fun onAddPokemonItemClick(pokemon:Pokemon)
+        fun onPokemonItemClick(pokemon:Pokemon)
     }
 
     private var listener: OnPokemonsFragment? = null
@@ -46,8 +46,8 @@ class PokemonsFragment: Fragment() {
         pokemonManager.getPokemons(currentPage,{pkList: List<Pokemon> ->
             pokemonList.addAll(pkList)
             rviPokemon.adapter = PokemonListAdapter(this, pokemonList){ pokemon: Pokemon ->
-                println("Test: " + pokemon.name)
-                listener?.onAddPokemonItemClick(pokemon)
+                println("Test: " + pokemon.id)
+                listener?.onPokemonItemClick(pokemon)
 
             }
         }, {error ->

@@ -2,6 +2,7 @@ package pe.edu.ulima.pm.pokeapp.model
 
 import androidx.room.Entity
 import androidx.room.ColumnInfo
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
@@ -22,7 +23,7 @@ data class Pokemon (
     @ColumnInfo(name = "spDefense")
     var spDefense: Int,
     @ColumnInfo(name = "imgUrl")
-    var imgUrl: String
-): Serializable{
-
-}
+    var imgUrl: String,
+    @ColumnInfo(name = "isFav")
+    var isFav: Boolean
+): Serializable{}
