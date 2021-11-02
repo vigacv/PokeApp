@@ -15,7 +15,7 @@ import java.lang.Exception
 class PokemonManager(private val context: Context) {
 
     private val db = Room.databaseBuilder(context, PokeAppDatabase
-    ::class.java, "db_videogames").allowMainThreadQueries().build()
+    ::class.java, "db_pokemons").allowMainThreadQueries().build()
 
     val API_BASE_URL = "https://pokeapi.co/api/v2/"
 
@@ -85,8 +85,8 @@ class PokemonManager(private val context: Context) {
         })
     }
 
-    private fun getPokemonsRoom(page: Int): List<Pokemon>{
-        return db.pokemonDAO().findAll((page*20))
+    fun getPokemonsRoom(page: Int): List<Pokemon>{
+        return db.pokemonDAO().findAll((page*20)+1)
     }
 
     private fun getPokemonsFavorite(): List<Pokemon> {

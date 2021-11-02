@@ -58,8 +58,8 @@ class PokemonsFragment: Fragment() {
         rviPokemon.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                currentPage++
                 if (!recyclerView.canScrollVertically(1)) {
+                    currentPage++
                     pokemonManager.getPokemons(currentPage, {pkList: List<Pokemon> ->
                         pokemonList.addAll(pkList)
                         rviPokemon.adapter?.notifyDataSetChanged()
