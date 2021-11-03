@@ -8,7 +8,7 @@ import pe.edu.ulima.pm.pokeapp.model.Pokemon
 
 @Dao
 interface PokemonDAO {
-    @Query("SELECT * FROM POKEMON LIMIT 20 OFFSET :pageIndex")
+    @Query("SELECT * FROM POKEMON ORDER BY id LIMIT 20 OFFSET :pageIndex ")
     fun findAll(pageIndex: Int): List<Pokemon>
 
     @Insert

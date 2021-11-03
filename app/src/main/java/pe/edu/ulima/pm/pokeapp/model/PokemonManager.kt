@@ -86,10 +86,10 @@ class PokemonManager(private val context: Context) {
     }
 
     fun getPokemonsRoom(page: Int): List<Pokemon>{
-        return db.pokemonDAO().findAll((page*20)+1)
+        return db.pokemonDAO().findAll((page*20))
     }
 
-    private fun getPokemonsFavorite(): List<Pokemon> {
+    fun getPokemonsFavorite(): List<Pokemon> {
         return db.pokemonDAO().findFavorites()
     }
 

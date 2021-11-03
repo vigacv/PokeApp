@@ -22,7 +22,6 @@ class PokemonsFavoriteFragment: Fragment() {
 
     interface OnPokemonsFavoriteFragment{
         fun onPokemonFavoriteItemClick(pokemon:Pokemon)
-        fun Ga()
     }
 
     private var listener: OnPokemonsFavoriteFragment? = null
@@ -37,7 +36,6 @@ class PokemonsFavoriteFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //pokemon = arguments?.getSerializable("pokemon") as Pokemon
         return inflater.inflate(R.layout.fragment_pokemons_favorite, container, false)
     }
 
@@ -50,12 +48,19 @@ class PokemonsFavoriteFragment: Fragment() {
 
         pokemonManager.getPokemonsFav({pkList: List<Pokemon> ->
             pkFavList.addAll(pkList)
-            rviPkFavorite.adapter = PokemonFavoriteListAdapter(this, pkFavList){ pokemon: Pokemon ->
-                println("Test: " + pokemon.name)
-
+            rviPkFavorite.adapter = PokemonFavoriteListAdapter(this, pkFavList, {
+                pokemonManager.deletePkFav(it)
+                var idPos = 0
+                pkFavList.forEachIndexed { id, pokemon ->
+                    if (pokemon.id == it){
+                        idPos = id
+                    }
+                }
+                pkFavList.removeAt(idPos)
+                rviPkFavorite.adapter?.notifyItemRemoved(idPos)
+            }){ pokemon: Pokemon ->
                 listener?.onPokemonFavoriteItemClick(pokemon)
             }
-
 
         }, {error ->
             println("Error: $error")

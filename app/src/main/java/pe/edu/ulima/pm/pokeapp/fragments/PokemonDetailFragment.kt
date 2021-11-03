@@ -62,17 +62,6 @@ class PokemonDetailFragment: Fragment() {
         }
     }
 
-    private fun almacenarPokemonAI(){
-        val gson = Gson()
-        val pokemonManager = PokemonManager(requireActivity().applicationContext)
-        /*
-        val pkFavList = pokemonManager.getPokemonsFavorite()
-        context?.openFileOutput("pokemon_fav.json", Context.MODE_PRIVATE).use{
-            it!!.write(gson.toJson(pkFavList).toByteArray(Charsets.UTF_8))
-        }
-        */
-    }
-
     private fun setPokemonDetail(view: View, pokemon: Pokemon){
         var img = view.findViewById<ImageView>(R.id.iviPokemon)
         Glide.with(this).load(pokemon.imgUrl).into(img)
