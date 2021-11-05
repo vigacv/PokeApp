@@ -28,9 +28,9 @@ class PokemonFavoriteListAdapter (private val fragment: Fragment,
                                   private val listener: (Pokemon) -> Unit): RecyclerView.Adapter<PokemonFavoriteListAdapter.ViewHolder>() {
 
     class ViewHolder(view: View,
-                    val pokemonList: List<Pokemon>,
-                    val listener: (Pokemon) -> Unit,
-                    val funRemove: (Long) -> Unit): RecyclerView.ViewHolder(view), View.OnClickListener {
+                     val pokemonList: List<Pokemon>,
+                     val listener: (Pokemon) -> Unit,
+                     val funRemove: (Long) -> Unit): RecyclerView.ViewHolder(view), View.OnClickListener {
         val tviPkFavorite:TextView
         val btnRemove: ImageButton
 

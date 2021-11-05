@@ -48,21 +48,21 @@ class PokemonManager(private val context: Context) {
                 if(context != null){
                     var pokemonList = mutableListOf<Pokemon>()
                     val results = p1.body()?.results
-                    results!!.forEach { pokemon: PokemonItem ->
+                    results!!.forEachIndexed { index:Int, pokemon: PokemonItem ->
                         val pokemonName = pokemon.name
                         service.getPokemonStats(pokemon.name).enqueue(object: Callback<PokemonApiInfo>{
                             override fun onResponse(
                                 p0: Call<PokemonApiInfo>,
                                 p1: Response<PokemonApiInfo>
                             ) {
+                                println(p1.body())
                                 val pokemonHp = p1.body()?.stats!![0].base_stat
                                 val pokemonAttack = p1.body()?.stats!![1].base_stat
                                 val pokemonDefense = p1.body()?.stats!![2].base_stat
                                 val pokemonSpAttack = p1.body()?.stats!![3].base_stat
                                 val pokemonSpDefense = p1.body()?.stats!![4].base_stat
-                                val pokemonImgUrl = p1.body()?.sprites?.front_default
 
-                                val newPokemon = Pokemon(0,pokemonName, pokemonHp, pokemonAttack, pokemonDefense, pokemonSpAttack, pokemonSpDefense, pokemonImgUrl!!, false)
+                                val newPokemon = Pokemon(0,pokemonName, pokemonHp, pokemonAttack, pokemonDefense, pokemonSpAttack, pokemonSpDefense, "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p1.body()?.id}.png", false)
                                 pokemonList.add(newPokemon)
 
                                 if(pokemonList.size >= results.size){
