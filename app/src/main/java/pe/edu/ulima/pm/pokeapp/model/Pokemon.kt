@@ -8,7 +8,7 @@ import java.io.Serializable
 
 @Entity
 data class Pokemon (
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     var id: Long,
     @ColumnInfo(name = "name")
     var name: String,

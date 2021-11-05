@@ -14,7 +14,7 @@ interface PokemonDAO {
     @Insert
     fun insert(pokemon: Pokemon)
 
-    @Query("SELECT * FROM POKEMON WHERE isFav = 1 ")
+    @Query("SELECT * FROM POKEMON WHERE isFav = 1 ORDER BY id")
     fun findFavorites(): List<Pokemon>
 
     @Query("UPDATE POKEMON SET isFav = :flag WHERE id = :id ")

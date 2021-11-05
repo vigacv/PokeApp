@@ -17,7 +17,8 @@ data class PokemonItem(
 
 data class PokemonApiInfo(
     val sprites: Sprites,
-    val stats: List<PokemonStat>
+    val stats: List<PokemonStat>,
+    val id: Int
 )
 
 data class PokemonStat(

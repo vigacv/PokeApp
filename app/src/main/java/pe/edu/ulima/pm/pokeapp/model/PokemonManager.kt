@@ -1,6 +1,7 @@
 package pe.edu.ulima.pm.pokeapp.model
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Room
 import pe.edu.ulima.pm.pokeapp.rom.PokeAppDatabase
 import pe.edu.ulima.pm.pokeapp.services.PokeAPIService
@@ -10,6 +11,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
+import java.util.*
 
 
 class PokemonManager(private val context: Context) {
@@ -42,7 +44,6 @@ class PokemonManager(private val context: Context) {
             .build()
 
         val service = retrofit.create(PokeAPIService::class.java)
-
         service.getAllPokemon(page*20).enqueue(object: Callback<PokeApiResult>{
             override fun onResponse(p0: Call<PokeApiResult>, p1: Response<PokeApiResult>) {
                 if(context != null){
@@ -51,10 +52,8 @@ class PokemonManager(private val context: Context) {
                     results!!.forEach { pokemon: PokemonItem ->
                         val pokemonName = pokemon.name
                         service.getPokemonStats(pokemon.name).enqueue(object: Callback<PokemonApiInfo>{
-                            override fun onResponse(
-                                p0: Call<PokemonApiInfo>,
-                                p1: Response<PokemonApiInfo>
-                            ) {
+                            override fun onResponse(p0: Call<PokemonApiInfo>,p1: Response<PokemonApiInfo>) {
+                                val pokemonId = p1.body()?.id
                                 val pokemonHp = p1.body()?.stats!![0].base_stat
                                 val pokemonAttack = p1.body()?.stats!![1].base_stat
                                 val pokemonDefense = p1.body()?.stats!![2].base_stat
@@ -62,15 +61,16 @@ class PokemonManager(private val context: Context) {
                                 val pokemonSpDefense = p1.body()?.stats!![4].base_stat
                                 val pokemonImgUrl = p1.body()?.sprites?.other?.officialartwork?.front_default
 
-                                val newPokemon = Pokemon(0,pokemonName, pokemonHp, pokemonAttack, pokemonDefense, pokemonSpAttack, pokemonSpDefense, pokemonImgUrl!!, false)
+                                val newPokemon = Pokemon(pokemonId!!.toLong(),pokemonName, pokemonHp, pokemonAttack, pokemonDefense, pokemonSpAttack, pokemonSpDefense, pokemonImgUrl!!, false)
                                 pokemonList.add(newPokemon)
 
                                 if(pokemonList.size >= results.size){
                                     if(context != null) saveIntoRoom(pokemonList)
+                                    pokemonList = pokemonList.sortedBy { Pokemon -> Pokemon.id }.toMutableList()
                                     callbackOK(pokemonList)
                                 }
-                            }
 
+                            }
                             override fun onFailure(p0: Call<PokemonApiInfo>, p1: Throwable) {
                                 p1.message?.let { callbackError(it) }
                             }
