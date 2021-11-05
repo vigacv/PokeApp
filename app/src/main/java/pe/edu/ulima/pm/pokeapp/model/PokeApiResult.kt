@@ -15,11 +15,15 @@ data class PokemonItem(
 )
 
 data class PokemonApiInfo(
-    val id: Int,
+    val sprites: Sprites,
     val stats: List<PokemonStat>
 )
 
 data class PokemonStat(
     val base_stat: Int,
     val effort: Int
+)
+
+data class Sprites(
+    val front_default: String
 )
