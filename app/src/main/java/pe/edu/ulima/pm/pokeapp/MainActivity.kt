@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity(),
         title = "PokeApp"
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+
                 when {
                     fragments[0].isVisible -> {
                         title = "PokeApp"
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity(),
                         title = "PokeApp"
                     }
                     fragments[2].isVisible -> {
+
                         if(supportFragmentManager.getBackStackEntryAt(0).name == "stackA"){
                             title = "Pokemones"
                         }else if(supportFragmentManager.getBackStackEntryAt(0).name == "stackB"){
@@ -57,6 +59,7 @@ class MainActivity : AppCompatActivity(),
                 }
 
             }
+
         })
         setContentView(R.layout.activity_main)
 
@@ -70,13 +73,14 @@ class MainActivity : AppCompatActivity(),
         val ft = supportFragmentManager.beginTransaction()
         if(nameFragment == "PokemonsFragment") {
             setTitle("Pokemones")
-            ft.add(R.id.flaMainContent, fragments[0])
+            ft.add(R.id.flaMainContent, fragments[0]).disallowAddToBackStack()
         }else if(nameFragment == "PokemonsFavoriteFragment"){
             setTitle("Favoritos")
-            ft.add(R.id.flaMainContent, fragments[1])
+            ft.add(R.id.flaMainContent, fragments[1]).disallowAddToBackStack()
         }
         ft.commit()
     }
+
 
     override fun onAddFavoriteClick() {
         setTitle("Pokemones")
@@ -84,7 +88,7 @@ class MainActivity : AppCompatActivity(),
         val fragment = fragments[0]
 
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.flaMainContent, fragment)
+        ft.replace(R.id.flaMainContent, fragment).disallowAddToBackStack()
 
         ft.commit()
 

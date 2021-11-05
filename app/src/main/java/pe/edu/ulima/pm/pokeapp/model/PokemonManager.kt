@@ -60,7 +60,7 @@ class PokemonManager(private val context: Context) {
                                 val pokemonDefense = p1.body()?.stats!![2].base_stat
                                 val pokemonSpAttack = p1.body()?.stats!![3].base_stat
                                 val pokemonSpDefense = p1.body()?.stats!![4].base_stat
-                                val pokemonImgUrl = p1.body()?.sprites?.front_default
+                                val pokemonImgUrl = p1.body()?.sprites?.other?.officialartwork?.front_default
 
                                 val newPokemon = Pokemon(0,pokemonName, pokemonHp, pokemonAttack, pokemonDefense, pokemonSpAttack, pokemonSpDefense, pokemonImgUrl!!, false)
                                 pokemonList.add(newPokemon)

@@ -34,6 +34,11 @@ class PokemonsFragment: Fragment() {
         return inflater.inflate(R.layout.fragment_pokemons, container, false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        requireActivity().title="Pokemones"
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

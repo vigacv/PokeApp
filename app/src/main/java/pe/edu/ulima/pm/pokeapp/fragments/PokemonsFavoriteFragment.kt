@@ -39,6 +39,11 @@ class PokemonsFavoriteFragment: Fragment() {
         return inflater.inflate(R.layout.fragment_pokemons_favorite, container, false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        requireActivity().title="Favoritos"
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val rviPkFavorite = view.findViewById<RecyclerView>(R.id.rviPkFavorite)
