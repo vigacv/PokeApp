@@ -3,6 +3,8 @@ package pe.edu.ulima.pm.pokeapp.model
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import pe.edu.ulima.pm.pokeapp.rom.PokeAppDatabase
 import pe.edu.ulima.pm.pokeapp.services.PokeAPIService
 import retrofit2.Call
@@ -21,72 +23,36 @@ class PokemonManager(private val context: Context) {
 
     val API_BASE_URL = "https://pokeapi.co/api/v2/"
 
+    private val dbFirebase = Firebase.firestore
+
     fun getPokemons(page: Int, callbackOK: (List<Pokemon>) -> Unit, callbackError: (String) -> Unit){
-        try {
-            val pokemonsRoom = getPokemonsRoom(page)
-            if(pokemonsRoom.isNotEmpty()){
-                println("Loading pokemons from Room...")
-                println(pokemonsRoom)
-                callbackOK(pokemonsRoom)
-            }else{
-                println("Loading pokemons from API...")
-                getPokemonsRetrofit(page, callbackOK, callbackError)
-            }
-        }catch (exception: Exception){
-            exception.message?.let { callbackError(it) }
-        }
-    }
-
-    private fun getPokemonsRetrofit(page: Int, callbackOK: (List<Pokemon>) -> Unit, callbackError: (String) -> Unit){
-        val retrofit = Retrofit.Builder()
-            .baseUrl(API_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(PokeAPIService::class.java)
-        service.getAllPokemon(page*20).enqueue(object: Callback<PokeApiResult>{
-            override fun onResponse(p0: Call<PokeApiResult>, p1: Response<PokeApiResult>) {
-                if(context != null){
-                    var pokemonList = mutableListOf<Pokemon>()
-                    val results = p1.body()?.results
-                    results!!.forEach { pokemon: PokemonItem ->
-                        val pokemonName = pokemon.name
-                        service.getPokemonStats(pokemon.name).enqueue(object: Callback<PokemonApiInfo>{
-                            override fun onResponse(p0: Call<PokemonApiInfo>,p1: Response<PokemonApiInfo>) {
-                                val pokemonId = p1.body()?.id
-                                val pokemonHp = p1.body()?.stats!![0].base_stat
-                                val pokemonAttack = p1.body()?.stats!![1].base_stat
-                                val pokemonDefense = p1.body()?.stats!![2].base_stat
-                                val pokemonSpAttack = p1.body()?.stats!![3].base_stat
-                                val pokemonSpDefense = p1.body()?.stats!![4].base_stat
-                                val pokemonImgUrl = p1.body()?.sprites?.other?.officialartwork?.front_default
-
-                                val newPokemon = Pokemon(pokemonId!!.toLong(),pokemonName, pokemonHp, pokemonAttack, pokemonDefense, pokemonSpAttack, pokemonSpDefense, pokemonImgUrl!!, false)
-                                pokemonList.add(newPokemon)
-
-                                if(pokemonList.size >= results.size){
-                                    if(context != null) saveIntoRoom(pokemonList)
-                                    pokemonList = pokemonList.sortedBy { Pokemon -> Pokemon.id }.toMutableList()
-                                    callbackOK(pokemonList)
-                                }
-
-                            }
-                            override fun onFailure(p0: Call<PokemonApiInfo>, p1: Throwable) {
-                                p1.message?.let { callbackError(it) }
-                            }
-                        })
-                    }
+        dbFirebase.collection("pokemon")
+            .orderBy("pokeApiId")
+            .startAt(1+page*20)
+            .endAt(20+page*20)
+            .get()
+            .addOnSuccessListener { res ->
+                val pokemons = arrayListOf<Pokemon>()
+                for(document in res){
+                    val pokemon = Pokemon(
+                        document.data["pokeApiId"].toString().toLong(),
+                        document.data["name"].toString(),
+                        document.data["hp"].toString().toInt(),
+                        document.data["attack"].toString().toInt(),
+                        document.data["defense"].toString().toInt(),
+                        document.data["spAttack"].toString().toInt(),
+                        document.data["spDefense"].toString().toInt(),
+                        document.data["imgUrl"].toString(),
+                        document.data["isFav"].toString().toBoolean()
+                    )
+                    pokemons.add(pokemon)
                 }
+                Log.d("PokemonManager", "Loaded page $page of pokemons from Firebase")
+                callbackOK(pokemons)
             }
-
-            override fun onFailure(p0: Call<PokeApiResult>, p1: Throwable) {
-                p1.message?.let { callbackError(it) }
+            .addOnFailureListener {
+                callbackError(it.message!!)
             }
-        })
-    }
-
-    fun getPokemonsRoom(page: Int): List<Pokemon>{
-        return db.pokemonDAO().findAll((page*20))
     }
 
     fun getPokemonsFavorite(): List<Pokemon> {
