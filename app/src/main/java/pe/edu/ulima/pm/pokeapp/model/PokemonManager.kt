@@ -3,6 +3,7 @@ package pe.edu.ulima.pm.pokeapp.model
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import pe.edu.ulima.pm.pokeapp.rom.PokeAppDatabase
@@ -66,27 +67,102 @@ class PokemonManager(private val context: Context) {
     }
 
     fun addPkFav(idPokemon:Long) {
-        db.pokemonDAO().updateFav(idPokemon, true)
+        var pokehash = "/pokemon/"
+        dbFirebase.collection("pokemon")
+            .whereEqualTo("pokeApiId", idPokemon)
+            .get()
+            .addOnSuccessListener{ document ->
+                if(!document.isEmpty){
+                    for(doc in document){
+                        pokehash = pokehash + doc.id
+                    }
+                    dbFirebase.collection("favorites")
+                        .whereEqualTo("pokeApiId",idPokemon)
+                        .get()
+                        .addOnSuccessListener { document ->
+                            if(document.isEmpty){
+                                val data = hashMapOf<String, Any>(
+                                    "pokeApiId" to idPokemon,
+                                    "pokemon" to dbFirebase.document(pokehash)
+                                    )
+                                dbFirebase.collection("favorites").add(data)
+                                    .addOnSuccessListener {
+                                        Log.i("Add Favorite Pokemon", "Document created successfully")
+                                    }
+                            }
+                        }
+                }
+            }
     }
 
     fun deletePkFav(idPokemon:Long) {
-        db.pokemonDAO().updateFav(idPokemon, false)
-    }
-
-    fun isPkFav(idPokemon:Long): Boolean{
-        return db.pokemonDAO().isPkFav(idPokemon)
-    }
-
-    fun getPokemonsFav(callbackOK: (List<Pokemon>) -> Unit, callbackError: (String) -> Unit){
-        try {
-            val pokemonsRoom = getPokemonsFavorite()
-            if(pokemonsRoom.isNotEmpty()){
-                println("Loading pokemons from Room...")
-                println(pokemonsRoom)
-                callbackOK(pokemonsRoom)
+        dbFirebase.collection("favorites")
+            .whereEqualTo("pokeApiId",idPokemon)
+            .get()
+            .addOnSuccessListener{ documents ->
+                if(!documents.isEmpty){
+                   val hash = documents.documents[0].id
+                    dbFirebase.collection("favorites").document(hash)
+                        .delete()
+                        .addOnSuccessListener{
+                            Log.i("DeletePkFav","DocumentSnapshot succesfully delete")
+                        }
+                        .addOnFailureListener{
+                            println(it.message!!)
+                        }
+                }
             }
-        }catch (exception: Exception){
-            exception.message?.let { callbackError(it) }
-        }
+    }
+
+    fun isPkFav(idPokemon:Long, callbackOK: (Boolean)-> Unit){
+        var resp = true
+        dbFirebase.collection("favorites")
+            .whereEqualTo("pokeApiId",idPokemon)
+            .get()
+            .addOnSuccessListener{ documents ->
+                if(!documents.isEmpty){
+                    resp = false
+                }
+                callbackOK(resp)
+            }
+            .addOnFailureListener{
+                println(it.message!!)
+            }
+    }
+
+    fun getPokemonsFav(callbackOK: (List<Pokemon>) -> Unit, callbackERROR: (String) -> Unit){
+        dbFirebase.collection("favorites")
+            .orderBy("pokeApiId")
+            .get()
+            .addOnSuccessListener{ res ->
+                val pokemonsFavList = arrayListOf<Pokemon>()
+                val total = res.size()
+                var cont = 1
+                for(document in res){
+                    (document.data["pokemon"]!! as DocumentReference).get().addOnSuccessListener { doc ->
+                        val pokemon = Pokemon(
+                            doc.data?.get("pokeApiId").toString().toLong(),
+                            doc.data?.get("name").toString(),
+                            doc.data?.get("hp").toString().toInt(),
+                            doc.data?.get("attack").toString().toInt(),
+                            doc.data?.get("defense").toString().toInt(),
+                            doc.data?.get("spAttack").toString().toInt(),
+                            doc.data?.get("spDefense").toString().toInt(),
+                            doc.data?.get("imgUrl").toString(),
+                            doc.data?.get("isFav").toString().toBoolean()
+                        )
+                        pokemonsFavList.add(pokemon)
+                        if(cont==total){
+                            Log.d("PokemonManager","Load favorite pokemons from Firebase")
+                            callbackOK(pokemonsFavList)
+                        }else{
+                            cont++
+                        }
+                    }
+                }
+            }
+            .addOnFailureListener{
+                callbackERROR(it.message!!)
+            }
     }
 }

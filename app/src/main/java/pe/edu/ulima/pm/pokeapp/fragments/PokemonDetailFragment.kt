@@ -48,11 +48,10 @@ class PokemonDetailFragment: Fragment() {
         val pokemonManager = PokemonManager(requireActivity().applicationContext)
         val btnAddFavorite = view.findViewById<Button>(R.id.btnAddFavorite)
 
-        if (pokemonManager.isPkFav(pokemon!!.id) == true){
-            btnAddFavorite.setEnabled(false)
-        }else{
-            btnAddFavorite.setEnabled(true)
+        pokemonManager.isPkFav(pokemon!!.id) {
+            btnAddFavorite.setEnabled(it)
         }
+
 
         setPokemonDetail(view, pokemon!!)
 
